@@ -23,6 +23,9 @@ const PROXY_PORT = process.env.PROXY_PORT;
 const PROXY_USERNAME = process.env.PROXY_USERNAME;
 const PROXY_PASSWORD = process.env.PROXY_PASSWORD;
 
+const FAILED_WEBHOOK_URL = process.env.FAILED_WEBHOOK_URL;
+const FAILED_WEBHOOK_URL_TOKEN = process.env.FAILED_WEBHOOK_URL_TOKEN;
+
 let proxyAgent = null;
 
 // Configure proxy agent
@@ -99,6 +102,17 @@ async function checkWebsite(retries = 0) {
       await sendNotification(
         `🚨 Error accessing the website: ${error.message}`
       );
+      try {
+        await http.get(FAILED_WEBHOOK_URL, {
+          headers: {
+            Authorization: `Bearer ${FAILED_WEBHOOK_URL_TOKEN}`,
+          },
+        });
+        console.warn(`🔃 Website redeploying ...`);
+        await sendNotification(`🔃 Website redeploying ...`);
+      } catch (error) {
+        console.error("⚠️ Failed to send redeploy message:", error.message);
+      }
     }
     lastStatus = "DOWN";
   }
