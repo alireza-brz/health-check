@@ -89,6 +89,10 @@ async function checkWebsite(retries = 0) {
       lastStatus = response.status;
     }
   } catch (error) {
+    console.error({
+      error,
+      MAX_RETRIES,
+    });
     if (retries < MAX_RETRIES) {
       console.warn(
         `🔁 Retry ${
