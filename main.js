@@ -102,16 +102,18 @@ async function checkWebsite(retries = 0) {
       await sendNotification(
         `🚨 Error accessing the website: ${error.message}`
       );
-      try {
-        await http.get(FAILED_WEBHOOK_URL, {
-          headers: {
-            Authorization: `Bearer ${FAILED_WEBHOOK_URL_TOKEN}`,
-          },
-        });
-        console.warn(`🔃 Website redeploying ...`);
-        await sendNotification(`🔃 Website redeploying ...`);
-      } catch (error) {
-        console.error("⚠️ Failed to send redeploy message:", error.message);
+      if (error.status !== 503) {
+        try {
+          await http.get(FAILED_WEBHOOK_URL, {
+            headers: {
+              Authorization: `Bearer ${FAILED_WEBHOOK_URL_TOKEN}`,
+            },
+          });
+          console.warn(`🔃 Website redeploying ...`);
+          await sendNotification(`🔃 Website redeploying ...`);
+        } catch (error) {
+          console.error("⚠️ Failed to send redeploy message:", error.message);
+        }
       }
     }
     lastStatus = "DOWN";
