@@ -106,7 +106,7 @@ async function checkWebsite(retries = 0) {
       await sendNotification(
         `🚨 Error accessing the website: ${error.message}`
       );
-      if (error.status !== 503) {
+      if (error.code === 'ECONNABORTED') {
         try {
           await http.get(FAILED_WEBHOOK_URL, {
             headers: {
